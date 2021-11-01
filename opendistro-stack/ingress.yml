@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: odfe-kibana-ingress
+  namespace: lamassu-ns
+  annotations: 
+    cert-manager.io/issuer:  "lamassu-ca-issuer"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - kibana.dev.lamassu.io
+    secretName: lamassu-ingress-tls
+  rules:
+  - host: kibana.dev.lamassu.io
+    http: 
+      paths:
+      - pathType: Prefix
+        path: /
+        backend: 
+          service: 
+            name: odfe-opendistro-es-kibana-svc
+            port:
+              number: 443

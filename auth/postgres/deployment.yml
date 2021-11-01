@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:  
+  name: auth-db
+  namespace: lamassu-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-db
+  template:
+    metadata:
+      labels:
+        app: auth-db
+    spec:
+      containers:
+        - name: ui
+          image: postgres:12
+          imagePullPolicy: Always
+          env:
+            - name: POSTGRES_DB
+              value: keycloak
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_USER
+              value: keycloak
+          ports:
+          - containerPort: 5432
+      restartPolicy: Always

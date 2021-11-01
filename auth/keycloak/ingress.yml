@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: auth-ingress
+  namespace: lamassu-ns
+  annotations: 
+    cert-manager.io/issuer:  "lamassu-ca-issuer"
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Forwarded-For $host;
+      proxy_set_header X-Forwarded-Proto $scheme;
+spec:
+  tls:
+  - hosts:
+    - auth.dev.lamassu.io
+    secretName: lamassu-ingress-tls
+  rules:
+  - host: auth.dev.lamassu.io
+    http: 
+      paths:
+      - pathType: Prefix
+        path: /
+        backend: 
+          service: 
+            name: keycloak
+            port:
+              number: 8080

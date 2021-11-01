@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:  
+  name: lamassu-ui
+  namespace: lamassu-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lamassu-ui
+  template:
+    metadata:
+      labels:
+        app: lamassu-ui
+    spec:
+      containers:
+        - name: ui
+          image: haritz/lamassu-ui:1.0
+          imagePullPolicy: Always
+          env:
+            - name: REACT_APP_AUTH_ENDPOINT
+              value: https://auth.dev.lamassu.io
+            - name: REACT_APP_AUTH_REALM
+              value: lamassu
+            - name: REACT_APP_AUTH_CLIENT_ID
+              value: frontend
+            - name: REACT_APP_CA_API
+              value: https://dev.lamassu.io:8087
+            - name: REACT_APP_DEVICES_API
+              value: https://dev.lamassu.io:8089
+            - name: REACT_APP_DMS_ENROLLER_API
+              value: https://dev.lamassu.io:8085
+            - name: REACT_APP_CONSUL_API
+              value: https://dev.lamassu.io:8501
+            - name: REACT_APP_DEFAULT_DMS_URL
+              value: https://dev.lamassu.io:5000
+          ports:
+          - containerPort: 3000
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always

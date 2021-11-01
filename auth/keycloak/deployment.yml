@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:  
+  name: keycloak
+  namespace: lamassu-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: haritz/lamassu-auth:1.0
+          imagePullPolicy: Always
+          env:
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+            - name: DB_VENDOR
+              value: postgres
+            - name: DB_ADDR
+              value: auth-db
+            - name: DB_DATABASE
+              value: keycloak
+            - name: DB_USER
+              value: keycloak
+            - name: DB_PASSWORD
+              value: password
+            - name: KEYCLOAK_USER
+              value: admin
+            - name: KEYCLOAK_PASSWORD
+              value: admin
+            - name: POSTGRaES_DB
+              value: /tmp/lamassu.json'
+          ports:
+          - containerPort: 8080
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always

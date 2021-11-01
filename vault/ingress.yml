@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: lamassu-vault-ingress
+  namespace: lamassu-ns
+  annotations: 
+    cert-manager.io/issuer:  "lamassu-ca-issuer"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - vault.dev.lamassu.io
+    secretName: lamassu-vault-ingress-tls
+  rules:
+  - host: vault.dev.lamassu.io
+    http: 
+      paths:
+      - pathType: Prefix
+        path: /
+        backend: 
+          service: 
+            name: vault
+            port:
+              number: 8200

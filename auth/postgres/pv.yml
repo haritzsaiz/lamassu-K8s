@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-db-pvc
+  namespace: lamassu-ns
+spec:
+  storageClassName: manual
+  volumeName: postgres-data-pv
+  accessModes:
+     - ReadWriteOnce
+  resources:
+    requests:
+      storage: 300Mi
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-db-pv
+  namespace: lamassu-ns
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 300Mi  
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /Users/haritzsaiz/Desktop/dev/lamassu/k8s-data/                 
+    type: DirectoryOrCreate
