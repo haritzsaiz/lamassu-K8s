@@ -66,4 +66,51 @@ kubectl get secrets root-ca-secret -n lamassu-ns -o 'go-template={{index .data "
 
 ![](./docs/img/decode_root_ca_secret.png)
 
+### 2.2 Deploying Vault (and consul)
+
+Vault is the core of the PKI. It's the service in charge of issuning certificates as well as storing them in a secure way. 
+
+Hashicorp have pakced their application creating two Helm charts, one for Vault and a second one for Consul. This section describes the steps as described in the official installation process: https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube?in=vault/kubernetes.
+
+Extra resources: https://learn.hashicorp.com/tutorials/vault/kubernetes-raft-deployment-guide?in=vault/kubernetes
+
+First add the Helm repo: 
+
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+```
+
+Update the helm repo:
+
+```
+helm repo update
+```
+
+And finally instal Consul:
+
+```
+helm install consul hashicorp/consul
+```
+
+And finally install consul. Note that all resources are installed in the `lamassu-ns` namespace
+
+```
+helm install consul hashicorp/consul --values helm-consul.yml -n lamasssu-ns
+```
+
+![](./docs/img/consul_deploy.png)
+
+Now it's time to install vault.
+
+Finally install Vault using the helm charts:
+
+```
+helm install vault hashicorp/vault --values helm-vault.yml -n lamassu-ns
+```
+
+![](./docs/img/vault_deploy.png)
+
+As it can bee seen in the image, the pods are not fully ready. That is because vault is either sealed or has not been intialized. 
+
+In order to acces 
 ## 3. Exploring Lamassu's monitoring services
