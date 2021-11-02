@@ -95,22 +95,61 @@ helm install consul hashicorp/consul
 And finally install consul. Note that all resources are installed in the `lamassu-ns` namespace
 
 ```
-helm install consul hashicorp/consul --values helm-consul.yml -n lamasssu-ns
+helm install consul hashicorp/consul --values consul/helm-consul.yml -n lamasssu-ns
 ```
 
 ![](./docs/img/consul_deploy.png)
+
+To access the UI using a friendly url, deploy the ingress:
+
+```
+kubectl apply -f consul/ingress.yml
+```
+Make sure your computer is able to reach the domain `consul.dev.lamassu.io`. Either configure a DNS server or add the following line to the `/etc/hosts` (if the kubernetes cluster is running elswere, point to one of the nodes IP):
+
+```
+consul.dev.lamassu.io  127.0.0.1
+vault.dev.lamassu.io   127.0.0.1
+```
+
+Consuls's UI should be access using this URL: https://consul.dev.lamassu.io
+
+![](./docs/img/consul_ui.png)
 
 Now it's time to install vault.
 
 Finally install Vault using the helm charts:
 
 ```
-helm install vault hashicorp/vault --values helm-vault.yml -n lamassu-ns
+helm install vault hashicorp/vault --values vault/helm-vault.yml -n lamassu-ns
 ```
 
 ![](./docs/img/vault_deploy.png)
 
-As it can bee seen in the image, the pods are not fully ready. That is because vault is either sealed or has not been intialized. 
+As it can bee seen in the image, the pods are not fully ready. That is because vault is either sealed and has not been intialized. 
 
-In order to acces 
+Deploy the ingress controller to access the UI:
+
+```
+kubectl apply -f vault/ingress.yml
+```
+
+Vault's UI should be accessible using this URL: https://vault.dev.lamassu.io
+
+![](./docs/img/vault_ui.png)
+
+Let's initialize vault by running the following command:
+
+```
+kubectl exec vault-0 -n lamassu-ns -- vault operator init -key-shares=1 -key-threshold=1 -format=json > vault-cluster-keys.json
+```
+
+A file named `vault-cluster-keys.json` should be created containing the unseal keys as well as the root token. Vault has been initialized so far, but has not been unsealed yet. Run the following commands to read the unseal key to unseal vault:
+
+```
+VAULT_UNSEAL_KEY=$(cat vault-cluster-keys.json | jq -r ".unseal_keys_b64[]")
+kubectl exec vault-0 -n lamassu-ns -- vault operator unseal $VAULT_UNSEAL_KEY
+```
+
+And that's it. Consul and Vault have been configured !!
 ## 3. Exploring Lamassu's monitoring services
