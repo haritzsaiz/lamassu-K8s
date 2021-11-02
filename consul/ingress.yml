@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: consul-ingress
+  namespace: lamassu-ns
+  annotations: 
+    cert-manager.io/issuer: "lamassu-ca-issuer"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - consul.dev.lamassu.io
+    secretName: consul-ingress-tls
+  rules:
+  - host: consul.dev.lamassu.io
+    http: 
+      paths:
+      - pathType: Prefix
+        path: /
+        backend: 
+          service: 
+            name: consul-consul-ui
+            port:
+              number: 80
